@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.repository.before.CartRepository">
+    <update id="updateUpwd">
+        update busertable
+        set bpwd=#{bpwd}
+        where id = #{uid}
+    </update>
+    <select id="selectCart" parameterType="Integer" resultType="map">
+        select gt.id, gt.gname, gt.gpicture, gt.grprice, ct.shoppingnum, ct.shoppingnum * gt.grprice smallsum
+        from GOODSTABLE gt,
+             CARTTABLE ct
+        where gt.id = ct.goodstable_id
+          and ct.busertable_id = #{uid}
+    </select>
+    <!-- DELETE method for clear -->
+    <delete id="clear">
+        DELETE FROM carttable
+        WHERE busertable_id = #{uid}
+    </delete>
+    <!-- DELETE method for deleteAgoods -->
+    <delete id="deleteAgoods">
+        DELETE FROM carttable
+        WHERE busertable_id = #{uid} AND goodstable_id = #{gid}
+    </delete>
+    <!-- INSERT method for putCart -->
+    <insert id="putCart">
+        INSERT INTO carttable (busertable_id, goodstable_id, shoppingnum)
+        VALUES (#{uid}, #{gid}, #{bnum})
+    </insert>
+    <!-- SELECT method for isPutCart -->
+    <select id="isPutCart" resultType="java.util.Map">
+        SELECT busertable_id as uid, goodstable_id as gid
+        FROM carttable
+        WHERE busertable_id = #{uid} AND goodstable_id = #{gid}
+    </select>
+    <!-- UPDATE method for updateCart -->
+    <update id="updateCart">
+        UPDATE carttable
+        SET shoppingnum = #{bnum}
+        WHERE busertable_id = #{uid} AND goodstable_id = #{gid}
+    </update>
+    <!-- SELECT method for isFocus -->
+    <select id="isFocus" resultType="java.util.Map">
+        SELECT busertable_id as uid, goodstable_id as gid
+        FROM focustable
+        WHERE busertable_id = #{uid} AND goodstable_id = #{gid}
+    </select>
+    <!-- INSERT method for focus -->
+    <insert id="focus">
+        INSERT INTO focustable (goodstable_id, busertable_id, focustime)
+        VALUES (#{gid}, #{uid}, now())
+    </insert>
+    <!-- SELECT method for myFocus -->
+    <select id="myFocus" resultType="map" parameterType="Integer">
+        SELECT gt.id, gt.gname, gt.goprice, gt.grprice, gt.gpicture
+        FROM focustable ft,
+             goodstable gt
+        WHERE ft.goodstable_id = gt.id
+        AND ft.busertable_id = #{uid}
+    </select>
+    <!-- SELECT method for myOrder -->
+    <select id="myOrder" resultType="java.util.Map">
+        SELECT id, amount, busertable_id, status, orderdate
+        FROM orderbasetable
+        WHERE busertable_id = #{uid}
+    </select>
+    <update id="pay" parameterType="Integer">
+        UPDATE orderbasetable
+        SET status=1
+        WHERE id = #{ordersn}
+    </update>
+</mapper>
